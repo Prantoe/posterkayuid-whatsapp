@@ -1,6 +1,6 @@
 node_modules/
 auth/
-.env
+env
 core
 uploads/
 proxy_cache_dir/
