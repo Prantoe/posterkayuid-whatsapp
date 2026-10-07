@@ -25,6 +25,7 @@ router.post('/send-message', async (req, res) => {
         chatId = group_id;
       } else if (to) {
         chatId = normalizeNum(to)
+        if (!chatId) return res.status(400).json({ ok: false, error: 'invalid_phone' })
       } else {
         return res.status(400).json({ status: 'error', message: 'Harus menyertakan group_id atau to' });
       }
@@ -39,18 +40,19 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
   try {
     const { group_id, to, caption } = req.body || {}
     const file = req.file
-    if (!group_id || !to || !file) return res.status(400).json({ ok: false, error: 'group_id, to & file wajib' })
+    if ((!group_id && !to) || !file) return res.status(400).json({ ok: false, error: 'group_id atau to, plus file wajib' })
+
+    const chatId = group_id || normalizeNum(to)
+    if (!chatId) return res.status(400).json({ ok: false, error: 'invalid_phone' })
 
     const buf = fs.readFileSync(file.path)
-    const mime = file.mimetype
-    const filename = file.originalname
-
-    const r = await sendDocument(normalizeNum(to), buf, mime, filename, caption)
-    fs.rmSync(file.path, { force: true })
+    const r = await sendDocument(chatId, buf, file.mimetype, file.originalname, caption)
 
     res.json({ ok: true, key: r?.key })
   } catch (e){
     res.status(500).json({ ok: false, error: String(e?.message || e) })
+  } finally {
+    if (req.file) fs.rmSync(req.file.path, { force: true })
   }
 })
 

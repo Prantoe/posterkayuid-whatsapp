@@ -7,3 +7,4 @@ proxy_cache_dir/
 *.zip
 *.log
 .DS_Store
+data/

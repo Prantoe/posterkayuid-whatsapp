@@ -13,6 +13,7 @@ import {
 import { ensureAuthDir } from './state.js'
 import { emitQR, emitStatus } from '../sockets.js'
 import { sendWebhook } from '../utils/webhook.js'
+import { rememberSent, getSentMessage } from '../utils/sentStore.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -39,6 +40,13 @@ export function getStatus(){ return statusText }
 export function getQR(){ return lastQR }
 export function getMe(){ return meJid }
 export function getSock(){ return sock }
+export function isConnected(){ return !!sock && !!meJid && statusText === 'Terhubung' }
+
+export async function isOnWhatsApp(jid){
+  if (!sock) throw new Error('Not connected')
+  const [r] = (await sock.onWhatsApp(jid)) || []
+  return !!r?.exists
+}
 
 async function renderQRToDataURL(qr){
   try {
@@ -67,6 +75,7 @@ export async function startBaileys(forceNew = false){
       auth: state,
       mobile: false,
       browser: Browsers.appropriate('Desktop'),
+      getMessage: async (key) => getSentMessage(key.id),
       markOnlineOnConnect: false,
       generateHighQualityLinkPreview: true,
       syncFullHistory: false
@@ -143,12 +152,16 @@ export async function logoutBaileys(){
 
 export async function sendText(jid, text){
   if (!sock) throw new Error('Not connected')
-  return await sock.sendMessage(jid, { text })
+  const sent = await sock.sendMessage(jid, { text })
+  rememberSent(sent)
+  return sent
 }
 
 export async function sendDocument(jid, buffer, mimetype, filename, caption){
   if (!sock) throw new Error('Not connected')
-  return await sock.sendMessage(jid, { caption, document: buffer, mimetype, fileName: filename })
+  const sent = await sock.sendMessage(jid, { caption, document: buffer, mimetype, fileName: filename })
+  rememberSent(sent)
+  return sent
 }
 
 function sanitizeMessage(msg){
