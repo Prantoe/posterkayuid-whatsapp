@@ -1,0 +1,39 @@
+{
+  "name": "baileys-webqr-rest",
+  "version": "1.1.0",
+  "type": "module",
+  "description": "Baileys + Tailwind Web QR Dashboard + REST API + Webhook (no Chromium) with Basic Auth & Bearer Token",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "start:prod": "NODE_ENV=production node src/server.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.10",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-basic-auth": "^1.2.1",
+    "multer": "^1.4.5-lts.1",
+    "p-queue": "^8.1.1",
+    "pino": "^9.3.2",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.7.5",
+    "zod": "^4.1.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "baileys",
+    "whatsapp",
+    "websocket",
+    "express",
+    "rest-api",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "MIT",
+  "private": true
+}

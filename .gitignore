@@ -1,0 +1,9 @@
+node_modules/
+auth/
+.env
+core
+uploads/
+proxy_cache_dir/
+*.zip
+*.log
+.DS_Store
